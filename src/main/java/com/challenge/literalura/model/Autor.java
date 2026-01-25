@@ -11,8 +11,8 @@ public class Autor {
     private Long id;
 
     private String nombre;
-    private Integer añioNacimiento;
-    private Integer añioMuerte;
+    private Integer año_Nacimiento;
+    private Integer año_Muerte;
 
     public Long getId() {
         return id;
@@ -30,19 +30,19 @@ public class Autor {
         this.nombre = nombre;
     }
 
-    public Integer getAñioNacimiento() {
-        return añioNacimiento;
+    public Integer getAño_Nacimiento() {
+        return año_Nacimiento;
     }
 
-    public void setAñioNacimiento(Integer añioNacimiento) {
-        this.añioNacimiento = añioNacimiento;
+    public void setAño_Nacimiento(Integer año_Nacimiento) {
+        this.año_Nacimiento = año_Nacimiento;
     }
 
-    public Integer getAñioMuerte() {
-        return añioMuerte;
+    public Integer getAño_Muerte() {
+        return año_Muerte;
     }
 
-    public void setAñioMuerte(Integer añioMuerte) {
-        this.añioMuerte = añioMuerte;
+    public void setAño_Muerte(Integer año_Muerte) {
+        this.año_Muerte = año_Muerte;
     }
 }

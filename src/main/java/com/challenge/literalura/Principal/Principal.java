@@ -4,8 +4,12 @@ import java.util.Scanner;
 
 import org.springframework.stereotype.Component;
 
+import com.challenge.literalura.model.Autor;
 import com.challenge.literalura.model.DatosLibro;
+import com.challenge.literalura.model.Libro;
 import com.challenge.literalura.model.RespuestaGutendex;
+import com.challenge.literalura.repository.AutorRepository;
+import com.challenge.literalura.repository.LibroRepository;
 import com.challenge.literalura.service.ConsumoAPI;
 import com.challenge.literalura.service.ConvierteDatos;
 
@@ -16,6 +20,9 @@ public class Principal {
     private final ConvierteDatos conversor = new ConvierteDatos();
     private final Scanner sc = new Scanner(System.in);
 
+    private final AutorRepository autorRepo;
+    private final LibroRepository libroRepo;
+
     private static final String URL = "https://gutendex.com/books/?search=";
 
     final String ANSI_RESET = "\u001B[0m";
@@ -25,6 +32,11 @@ public class Principal {
     final String ANSI_BLUE = "\u001B[34m";
     final String ANSI_PURPLE = "\u001B[35m";
 
+    
+    public Principal(AutorRepository autorRepo, LibroRepository libroRepo) {
+        this.autorRepo = autorRepo;
+        this.libroRepo = libroRepo;
+    }
 
     public void iniciar() {
         int opcion = -1;
@@ -70,10 +82,39 @@ public class Principal {
         // TOMAMOS EL PRIMERO
 DatosLibro libro = respuesta.results().get(0);
 
+    if(libroRepo.existsByTitulo(libro.titulo())){
+        System.out.println(ANSI_RED + "El libro ya existe en la base de datos" + ANSI_RESET);
+        return;
+    }
+
+    var autorApi = libro.autores().get(0);
+
+Autor autor = autorRepo
+        .findByNombre(autorApi.name())
+        .orElseGet(() -> {
+            Autor nuevo = new Autor();
+            nuevo.setNombre(autorApi.name());
+            nuevo.setAño_Nacimiento(autorApi.birthYear());
+            nuevo.setAño_Muerte(autorApi.deathYear());
+            return autorRepo.save(nuevo);
+        });
+
+Libro libroEntidad = new Libro();
+libroEntidad.setTitulo(libro.titulo());
+libroEntidad.setIdioma(libro.idiomas().get(0));
+libroEntidad.setDescargas(libro.cantidadDeDescargas());
+libroEntidad.setAutor(autor);
+
+libroRepo.save(libroEntidad);
+
+
 System.out.println(ANSI_GREEN + "Título: " + libro.titulo() + ANSI_RESET);
 System.out.println(ANSI_GREEN + "Autor: " + libro.autores().get(0).name() + ANSI_RESET);
 System.out.println(ANSI_GREEN + "Idioma: " + libro.idiomas().get(0) + ANSI_RESET);
 System.out.println(ANSI_GREEN + "Descargas: " + libro.cantidadDeDescargas() + ANSI_RESET);
 
     }
+
+
+
 }

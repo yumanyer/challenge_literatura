@@ -1,7 +1,5 @@
 package com.challenge.literalura.model;
 
-import java.time.LocalDate;
-import java.time.format.DateTimeParseException;
 
 import jakarta.persistence.*;
 
