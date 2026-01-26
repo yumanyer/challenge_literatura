@@ -14,6 +14,15 @@ public class Autor {
     private Integer año_Nacimiento;
     private Integer año_Muerte;
 
+    @Override
+    public String toString() {
+        return 
+                " nombre='" + nombre + '\'';
+    }
+    public Autor() {}
+
+
+
     public Long getId() {
         return id;
     }

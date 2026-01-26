@@ -20,6 +20,19 @@ public class Libro {
      private Autor autor;
 
 
+    @Override
+    public String toString() {
+        return "Libro = " +
+                " titulo='" + titulo + '\'' +
+                ", autor=" + autor +
+                ", idioma='" + idioma + '\'' +
+                ", descargas=" + descargas ;
+    }
+    public Libro() {}
+
+
+
+
     public long getId() {
         return id;
     }

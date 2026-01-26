@@ -1,5 +1,7 @@
 package com.challenge.literalura.Principal;
 
+import java.util.Comparator;
+import java.util.List;
 import java.util.Scanner;
 
 import org.springframework.stereotype.Component;
@@ -22,6 +24,8 @@ public class Principal {
 
     private final AutorRepository autorRepo;
     private final LibroRepository libroRepo;
+
+    private List <Libro> libros;
 
     private static final String URL = "https://gutendex.com/books/?search=";
 
@@ -55,7 +59,7 @@ public class Principal {
 
             switch (opcion) {
                 case 1 -> buscarLibroPorTitulo();
-                case 2 -> System.out.println("Listar libros registrados (pendiente DB)");
+                case 2 -> mostraLibrosGuardados();
                 case 3 -> System.out.println("Listar autores registrados (pendiente DB)");
                 case 4 -> System.out.println("Autores vivos en un año (pendiente DB)");
                 case 5 -> System.out.println("Listar libros por idioma (pendiente DB)");
@@ -115,6 +119,18 @@ System.out.println(ANSI_GREEN + "Descargas: " + libro.cantidadDeDescargas() + AN
 
     }
 
+    private void mostraLibrosGuardados(){
 
+        libros = libroRepo.findAll();
+
+        if(libros.isEmpty()){
+            System.out.println("No hay libros guardados");
+            return;
+        }
+        libros.stream()
+        .sorted(Comparator.comparing(Libro::getDescargas))
+        .forEach(libros->System.out.println(ANSI_GREEN+ libros + ANSI_RESET));
+
+    }
 
 }
