@@ -20,14 +20,16 @@ public class Libro {
      private Autor autor;
 
 
+    
     @Override
     public String toString() {
-        return "Libro = " +
-                " titulo='" + titulo + '\'' +
-                ", autor=" + autor +
-                ", idioma='" + idioma + '\'' +
-                ", descargas=" + descargas ;
+        return "Libro:\n" +
+                "Titulo: " + titulo + "\n" +
+                "Autor: " + autor + "\n" +
+                "Idioma: " + idioma + "\n" +
+                "Descargas: " + descargas + "\n";
     }
+
     public Libro() {}
 
 

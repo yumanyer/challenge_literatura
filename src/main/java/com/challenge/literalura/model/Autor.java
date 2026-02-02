@@ -17,7 +17,7 @@ public class Autor {
     @Override
     public String toString() {
         return 
-                " nombre='" + nombre + '\'';
+                " Autor:'" + nombre + '\'';
     }
     public Autor() {}
 

@@ -26,6 +26,7 @@ public class Principal {
     private final LibroRepository libroRepo;
 
     private List <Libro> libros;
+    
 
     private static final String URL = "https://gutendex.com/books/?search=";
 
@@ -54,16 +55,23 @@ public class Principal {
             System.out.println(ANSI_PURPLE + "5. Listar libro por idioma" + ANSI_RESET);
             System.out.println(ANSI_PURPLE + "0. Salir" + ANSI_RESET);
 
+
+            if(!sc.hasNextInt()){
+                System.out.println( ANSI_RED + "Ingresa un número valido" + ANSI_RESET);
+                sc.nextLine();
+                continue;
+            }
+
             opcion = sc.nextInt();
             sc.nextLine(); // limpiar buffer
-
+            
             switch (opcion) {
                 case 1 -> buscarLibroPorTitulo();
                 case 2 -> mostraLibrosGuardados();
-                case 3 -> System.out.println("Listar autores registrados (pendiente DB)");
-                case 4 -> System.out.println("Autores vivos en un año (pendiente DB)");
-                case 5 -> System.out.println("Listar libros por idioma (pendiente DB)");
-                case 0 -> System.out.println("Salir");
+                case 3 -> listarAutoresRegistrados();
+                case 4 -> listarAutoresVivos();
+                case 5 -> listarLibrosPorIdioma();
+                case 0 -> System.out.println( ANSI_RED + "Adios" + ANSI_RESET);
                 default -> System.out.println("Opción inválida");
             }
         }
@@ -133,4 +141,120 @@ System.out.println(ANSI_GREEN + "Descargas: " + libro.cantidadDeDescargas() + AN
 
     }
 
+    private void listarAutoresRegistrados() {
+
+    List<Autor> autores = autorRepo.findAll();
+
+    if (autores.isEmpty()) {
+        System.out.println("No hay autores guardados");
+        return;
+    }
+
+    List<Libro> librosGuardados = libroRepo.findAll();
+
+    for (Autor autor : autores) {
+
+        System.out.println(ANSI_YELLOW +"AUTOR: " + autor.getNombre() + ANSI_RESET);
+        System.out.println(ANSI_YELLOW +"NACIMIENTO: " + autor.getAño_Nacimiento() + ANSI_RESET);
+        System.out.println(ANSI_YELLOW +"FALLECIMIENTO: " + autor.getAño_Muerte() + ANSI_RESET);
+        System.out.println(ANSI_YELLOW +"LIBROS:" + ANSI_RESET);
+        
+        boolean tieneLibros = false;
+
+        for (Libro libro : librosGuardados) {
+        if (libro.getAutor().getId().equals(autor.getId())) {
+                System.out.println(" - " + libro.getTitulo());
+                tieneLibros = true;
+            }
+        }
+
+        if (!tieneLibros) {
+            System.out.println(" - (sin libros registrados)");
+        }
+
+        System.out.println("----------------------------");
+    }
 }
+
+    private void listarAutoresVivos() {
+
+    System.out.println(ANSI_BLUE + "Ingrese el año para consultar autores vivos" + ANSI_RESET);
+    int añoNacimiento = sc.nextInt();
+    sc.nextLine();
+
+    List<Autor> autores = autorRepo.findAll();
+
+    if (autores.isEmpty()) {
+        System.out.println(ANSI_RED + "No hay autores guardados" + ANSI_RESET);
+        return;
+    }
+
+    List<Libro> librosGuardados = libroRepo.findAll();
+
+    boolean hayResultados = false;
+
+    for (Autor autor : autores) {
+
+        if (autor.getAño_Nacimiento() <= añoNacimiento &&
+           (autor.getAño_Muerte() == null || autor.getAño_Muerte() >= añoNacimiento)) {
+
+            hayResultados = true;
+
+            System.out.println(ANSI_YELLOW + "AUTOR: " + autor.getNombre() + ANSI_RESET);
+            System.out.println(ANSI_YELLOW + "NACIMIENTO: " + autor.getAño_Nacimiento() + ANSI_RESET);
+            System.out.println(ANSI_YELLOW + "FALLECIMIENTO: " + autor.getAño_Muerte() + ANSI_RESET);
+            System.out.println(ANSI_YELLOW + "LIBROS:" + ANSI_RESET);
+
+            boolean tieneLibros = false;
+
+            for (Libro libro : librosGuardados) {
+                if (libro.getAutor().getId().equals(autor.getId())) {
+                    System.out.println(" - " + libro.getTitulo());
+                    tieneLibros = true;
+                }
+            }
+
+            if (!tieneLibros) {
+                System.out.println(" - (sin libros registrados)");
+            }
+
+            System.out.println("----------------------------");
+        }
+    }
+
+    if (!hayResultados) {
+        System.out.println(ANSI_RED + "No hay autores registrados vivos en ese año" + ANSI_RESET);
+    }
+}
+
+private void listarLibrosPorIdioma() {
+
+    List<String> idiomasDisponibles = libroRepo.findDistinctIdiomas();
+
+    if (idiomasDisponibles.isEmpty()) {
+        System.out.println(ANSI_RED + "No hay idiomas registrados" + ANSI_RESET);
+        return;
+    }
+
+    System.out.println(ANSI_YELLOW + "Idiomas disponibles:" + ANSI_RESET);
+    idiomasDisponibles.forEach(idioma -> System.out.println(" - " + idioma));
+
+    System.out.println(ANSI_BLUE + "Ingrese el idioma para consultar los libros" + ANSI_RESET);
+    String idiomaSeleccionado = sc.nextLine().trim();
+
+    List<Libro> libros = libroRepo.findByIdioma(idiomaSeleccionado);
+
+    if (libros.isEmpty()) {
+        System.out.println(ANSI_RED + "No hay libros registrados con ese idioma" + ANSI_RESET);
+        return;
+    }
+
+    libros.stream()
+            .sorted(Comparator.comparing(Libro::getDescargas).reversed())
+            .forEach(libro ->
+                    System.out.println(ANSI_GREEN + libro + ANSI_RESET)
+            );
+}
+
+
+}   
